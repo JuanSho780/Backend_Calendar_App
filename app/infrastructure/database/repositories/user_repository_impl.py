@@ -3,45 +3,107 @@ from app.domain.entities.User import User
 from typing import List, Optional
 from app.domain.value_objects.create_user_schema import CreateUserSchema
 from app.infrastructure.database.db_connection_factory import DBConnectionFactory # for db connection
+from fastapi import HTTPException
 
 class UserRepositoryImpl(UserRepository):
-    list_users: List[User] = []
-    count_id: int = 0
 
     def get_user_by_username(self, username: str) -> Optional[User]:
-        for user in UserRepositoryImpl.list_users:
-            if user.name == username:
-                return user
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT id, name, email, password FROM users WHERE name = %s", (username,))
+                user_data = cursor.fetchone()
+                if user_data:
+                    return User(
+                        id=user_data[0],
+                        name=user_data[1],
+                        email=user_data[2],
+                        password=user_data[3]
+                    )
+                else:
+                    raise HTTPException(status_code=404, detail="User not found")
+        finally:
+            DBConnectionFactory.release_connection(connection)
 
     def get_all_users(self) -> List[User]:
-        return UserRepositoryImpl.list_users
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT id, name, email, password FROM users")
+                users_data = cursor.fetchall()
+                return [
+                    User(
+                        id=user[0],
+                        name=user[1],
+                        email=user[2],
+                        password=user[3]
+                    ) for user in users_data
+                ]
+        finally:
+            DBConnectionFactory.release_connection(connection)
 
     def get_user_by_id(self, user_id: int) -> Optional[User]:
-        for user in UserRepositoryImpl.list_users:
-            if user.id == user_id:
-                return user
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT id, name, email, password FROM users WHERE id = %s", (user_id,))
+                user_data = cursor.fetchone()
+                if user_data:
+                    return User(
+                        id=user_data[0],
+                        name=user_data[1],
+                        email=user_data[2],
+                        password=user_data[3]
+                    )
+                else:
+                    raise HTTPException(status_code=404, detail="User not found")
+        finally:
+            DBConnectionFactory.release_connection(connection)
 
     def create_user(self, user: CreateUserSchema) -> User:
-        new_user = User(
-            id=UserRepositoryImpl.count_id,
-            name=user.name,
-            email=user.email,
-            password=user.password
-        )
-        UserRepositoryImpl.list_users.append(new_user)
-        UserRepositoryImpl.count_id += 1
-        return new_user
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "INSERT INTO users (name, email, password) VALUES (%s, %s, %s) RETURNING id",
+                    (user.name, user.email, user.password)
+                )
+                user_id = cursor.fetchone()[0]
+                connection.commit()
+                return User(
+                    id=user_id,
+                    name=user.name,
+                    email=user.email,
+                    password=user.password
+                )
+        finally:
+            DBConnectionFactory.release_connection(connection)
 
     def update_user(self, user_id: int, user: User) -> Optional[User]:
-        for i, u in enumerate(UserRepositoryImpl.list_users):
-            if u.id == user_id:
-                UserRepositoryImpl.list_users[i] = user
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE users SET name = %s, email = %s, password = %s WHERE id = %s",
+                    (user.name, user.email, user.password, user_id)
+                )
+                connection.commit()
                 return user
-        return None
+        finally:
+            DBConnectionFactory.release_connection(connection)
 
     def delete_user(self, user_id: int) -> bool:
-        for i, u in enumerate(UserRepositoryImpl.list_users):
-            if u.id == user_id:
-                del UserRepositoryImpl.list_users[i]
-                return True
-        return False
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+                connection.commit()
+                return cursor.rowcount > 0
+        finally:
+            DBConnectionFactory.release_connection(connection)

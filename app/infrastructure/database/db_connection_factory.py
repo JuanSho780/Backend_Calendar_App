@@ -1,18 +1,21 @@
 from psycopg2 import pool
+from dotenv import load_dotenv
+import os
 
 class DBConnectionFactory:
     _connection_pool = None
 
     @classmethod
     def initialize(cls, minconn: int = 1, maxconn: int = 5):
+        load_dotenv()  # Load environment variables from .env file
         if cls._connection_pool is None: #Singleton pattern
             cls._connection_pool = pool.SimpleConnectionPool(
                 minconn, maxconn,
-                user='your_user',
-                password='your_password',
-                host='your_host',
-                port='your_port',
-                database='your_database'
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT"),
+                database=os.getenv("DB_NAME")
             )
 
     @classmethod

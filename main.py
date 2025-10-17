@@ -8,7 +8,7 @@ from app.infrastructure.database.db_connection_factory import DBConnectionFactor
 
 app = FastAPI()
 
-"""@app.on_event("startup")
+@app.on_event("startup")
 def startup():
     print("Starting up connection pool...")
     DBConnectionFactory.initialize()
@@ -16,7 +16,7 @@ def startup():
 @app.on_event("shutdown")
 def shutdown():
     print("Shutting down connection pool...")
-    DBConnectionFactory.close_pool()"""
+    DBConnectionFactory.close_pool()
 
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(calendar_router, prefix="/calendars", tags=["calendars"])
