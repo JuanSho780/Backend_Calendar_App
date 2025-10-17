@@ -1,0 +1,1 @@
+Base del codigo fue creacion de la clase calendar con un id secuencial segun se creaban. Sin embargo, se propuso que el id del calendar sea segun la fecha seleccionada para registrar los eventos y times.
