@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.infrastructure.routers.user_router import router as user_router
 from app.infrastructure.routers.calendar_router import router as calendar_router
 from app.infrastructure.routers.event_router import router as event_router
@@ -7,6 +9,21 @@ from app.infrastructure.routers.time_router import router as time_router
 from app.infrastructure.database.db_connection_factory import DBConnectionFactory
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:3001/",
+    "http://localhost:3002"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def startup():

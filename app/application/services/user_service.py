@@ -6,11 +6,11 @@ class UserService:
     def __init__(self, user_repository: UserRepository): # Dependency Injection
         self.user_repository = user_repository
 
-    def login_user(self, username: str, password: str) -> bool:
+    def login_user(self, username: str, password: str) -> int | None:
         user = self.user_repository.get_user_by_username(username)
         if user and user.password == password:
-            return True
-        return False
+            return user.id
+        return None
 
     def get_all_users(self) -> list[User]:
         return self.user_repository.get_all_users()

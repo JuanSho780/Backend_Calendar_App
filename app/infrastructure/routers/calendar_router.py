@@ -44,12 +44,13 @@ def get_calendar_by_id(calendar_id: int, service: CalendarService = Depends(get_
 
 @router.get("/get_calendar_events_times/{calendar_id}", response_model=CalendarEventsTimesSchema, summary="Get calendar with its events and times by calendar ID")
 def get_calendar_events_times(calendar_id: int, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service)):
+    calendar = calendar_service.get_calendar_by_id(calendar_id)
     events = event_service.get_all_events_by_calendar(calendar_id)
     event_times = []
     for event in events:
         times = time_service.get_all_times_by_event(event.id)
         event_times.append(EventTimesSchema(id_calendar=event.calendar_id, event=event, times=times))
-    return CalendarEventsTimesSchema(calendar=calendar_service.get_calendar_by_id(calendar_id), events_times=event_times)
+    return CalendarEventsTimesSchema(calendar=calendar, events_times=event_times)
 
 @router.post("/create_calendar", response_model=Calendar, summary="Create a new calendar")
 def create_calendar(calendar: CreateCalendarSchema, service: CalendarService = Depends(get_calendar_service)):
