@@ -1,0 +1,300 @@
+# **Informe Técnico de Cambios – Backend Planifyme**
+
+**Proyecto:** Planifyme
+**Módulo:** Backend (FastAPI, almacenamiento en memoria)
+**Fecha:** 16/10/2025
+**Autor:** Equipo de Integración Front/Back
+
+---
+
+## 1. Propósito del cambio
+
+Alinear el backend con el nuevo flujo del frontend para:
+
+* Crear/usar un **Calendar por día y usuario** antes de registrar **Event** y sus **Time**.
+* **Permitir que el frontend envíe el `id` del Calendar** (p.ej., derivado de la fecha) y no forzar autoincrementos.
+* Evitar errores cuando aún no exista un Calendar para una fecha solicitada.
+* Añadir **logs de auditoría** en las operaciones de creación para facilitar la depuración.
+
+---
+
+## 2. Resumen ejecutivo
+
+* Se ajustó el **esquema de creación de Calendar** para aceptar `id` proporcionado por el cliente.
+* La ruta **GET** que devuelve Calendar + Events + Times ahora **no rompe** si el Calendar no existe (retorna estructura vacía).
+* Se corrigieron discrepancias con el **servicio de Time** (se usa `get_all_times_by_event`).
+* Se añadieron **logs `INFO`** en `create_calendar`, `create_event` y `create_time`.
+* La API soporta el flujo del frontend: **asegurar/crear Calendar → crear Event → crear Times → consultar**.
+
+---
+
+## 3. Contexto y alcance
+
+### 3.1. Modelos (en memoria)
+
+* **Calendar**: `id`, `name`, `description`, `color`, `user_id`
+* **Event**: `id`, `title`, `description`, `location`, `calendar_id`
+* **Time**: `id`, `event_id`, `start_time`, `end_time`
+
+> No se utiliza aún base de datos persistente; los repositorios mantienen listas en memoria.
+
+### 3.2. Flujo esperado desde frontend
+
+1. Verificar si existe Calendar del día para el usuario (por `name`, p.ej. “YYYY-MM-DD”).
+2. Si **no existe**, **crear** Calendar (con `id` enviado por el front).
+3. Crear Event con `calendar_id`.
+4. Crear Times asociados al `event_id` devuelto.
+5. Consultar Calendar con sus Events + Times para mostrarlo.
+
+---
+
+## 4. Cambios por archivo
+
+### 4.1. `app/domain/value_objects/create_calendar_schema.py`
+
+**Antes:** el esquema no admitía `id` en la creación.
+**Ahora:**
+
+```py
+class CreateCalendarSchema(BaseModel):
+    id: int                # ← NUEVO: id provisto por el cliente
+    name: str
+    description: str
+    color: str
+    user_id: int
+```
+
+**Impacto:** el cliente (frontend) puede fijar el `id` del Calendar (p.ej., basado en la fecha), evitando autoincrementos que dificultaban la relación con Events/Times.
+
+---
+
+### 4.2. `app/infrastructure/database/repositories/calendar_repository_impl.py`
+
+**Ajustes clave:**
+
+* `create_calendar(...)` **respeta** el `id` recibido (no genera uno nuevo).
+* Se mantiene la búsqueda y listado por `user_id` o `id`.
+
+**Motivo:** el frontend necesita **reutilizar** un Calendar de un día si existe o **crearlo** con un id “controlado” si no existe.
+
+> **Nota:** hoy no se valida duplicado de `id`; ver recomendaciones en §8.
+
+---
+
+### 4.3. `app/infrastructure/routers/calendar_router.py`
+
+**Rutas afectadas:**
+
+* **GET** `/calendars/get_calendar_events_times/{calendar_id}`
+
+  * **Antes:** error 500 si el Calendar no existía.
+  * **Ahora:** devuelve **estructura vacía**:
+
+    ```json
+    { "calendar": null, "events_times": [] }
+    ```
+  * Se usa el servicio **`get_all_times_by_event`** para obtener bloques (coherente con el servicio real).
+
+* **POST** `/calendars/create_calendar`
+
+  * Acepta `CreateCalendarSchema` con `id` del cliente.
+  * Devuelve el Calendar creado.
+
+* **Logs:**
+
+  * En creación de Calendar: id, user_id, color, etc. (nivel `INFO`).
+
+**Beneficio:**
+Frontend puede consultar un día sin calendar sin romper la UI y construir el flujo “asegurar/crear” de forma segura.
+
+---
+
+### 4.4. `app/infrastructure/routers/event_router.py` y `time_router.py`
+
+**Añadidos:**
+
+* **Logs `INFO`** en `create_event` y `create_time`:
+
+  * Event: `id`, `title`, `calendar_id`, `location`.
+  * Time: `id`, `event_id`, `start`, `end`.
+
+**Motivo:** trazabilidad de ids y horarios para detectar rápidamente inconsistencias (p.ej., `event_id` incorrecto en Time).
+
+---
+
+## 5. Comportamiento actual de las rutas (extracto)
+
+### 5.1. Crear Calendar
+
+`POST /calendars/create_calendar`
+**Entrada (ejemplo):**
+
+```json
+{
+  "id": 20251016,
+  "name": "2025-10-16",
+  "description": "Calendario del día",
+  "color": "#1a73e8",
+  "user_id": 0
+}
+```
+
+**Salida:** objeto `Calendar` creado.
+
+### 5.2. Obtener Calendar con eventos y tiempos
+
+`GET /calendars/get_calendar_events_times/{calendar_id}`
+
+* Si existe: retorna `calendar` + array `events_times`.
+* Si **no existe**:
+
+  ```json
+  { "calendar": null, "events_times": [] }
+  ```
+
+### 5.3. Crear Event
+
+`POST /events/create_event`
+**Entrada:**
+
+```json
+{
+  "title": "Reunión",
+  "description": "Plan sprint",
+  "location": "Sala 2",
+  "calendar_id": 20251016
+}
+```
+
+**Salida:** `{"id": <id_evento_generado>, ...}`
+
+### 5.4. Crear Time
+
+`POST /times/create_time`
+**Entrada:**
+
+```json
+{
+  "start_time": { "year":2025,"month":10,"day":16,"hour":9,"minute":0 },
+  "end_time":   { "year":2025,"month":10,"day":16,"hour":10,"minute":0 },
+  "event_id": 1
+}
+```
+
+**Salida:** `{"id": <id_time>, "event_id": 1, ...}`
+
+---
+
+## 6. Manejo de errores y validaciones
+
+* **Eliminado 500** al consultar un calendar inexistente: se devuelve estructura vacía.
+* **Pydantic v2**: los esquemas coinciden con lo que se recibe/envía realmente.
+* **Servicios**: se corrige el método de tiempos usado (`get_all_times_by_event`) para evitar `AttributeError`.
+
+---
+
+## 7. Registro (logging)
+
+Se agregaron logs `INFO` en:
+
+* **calendar_router – create_calendar**
+  Mensaje tipo:
+
+  ```
+  created calendar | id=20251016 user_id=0 color=#1a73e8
+  ```
+* **event_router – create_event**
+
+  ```
+  created event | id=1 title=Reunión calendar_id=20251016 location=Sala 2
+  ```
+* **time_router – create_time**
+
+  ```
+  created time | id=0 event_id=1 start=16/10/2025 09:00 end=16/10/2025 10:00
+  ```
+
+**Utilidad:** verificación inmediata de ids encadenados y parámetros enviados por el frontend.
+
+---
+
+## 8. Limitaciones y próximos pasos
+
+1. **Persistencia**: todo está en memoria; reiniciar borra datos.
+   **Recomendación:** migrar a BD (SQLite/PostgreSQL) con ORM.
+
+2. **Duplicados de Calendar**: hoy no se valida si ya existe un `id` o `(user_id, name)` igual.
+   **Recomendación:**
+
+   * Antes de crear, validar duplicado.
+   * Definir regla: ¿el `id` se considera único global o por `user_id`?
+
+3. **Autorización / Usuario**: `user_id` se envía plano.
+   **Recomendación:** integrar autenticación y extraer `user_id` desde el token.
+
+4. **Integridad de referencias**: no hay validaciones cruzadas (p.ej., que `event.calendar_id` exista, que `time.event_id` exista).
+   **Recomendación:** añadir validaciones a nivel de servicio/repo.
+
+---
+
+## 9. Pruebas sugeridas (checklist)
+
+* [ ] Crear Calendar con `id` enviado por el cliente.
+* [ ] Reutilizar Calendar existente (mismo `name`) y verificar que no se duplica.
+* [ ] Crear Event y Time y comprobar que los logs muestren `event_id` consistente.
+* [ ] Consultar Calendar sin existir → estructura vacía.
+* [ ] Consultar Calendar con Events + Times → ver “pills” en frontend.
+
+---
+
+## 10. Conclusión
+
+Los cambios implementados **alinean la API** con las necesidades del frontend y **mejoran la resiliencia** del sistema (sin errores al consultar fechas aún no creadas).
+Con los **logs** agregados, la trazabilidad de creación es clara y los problemas (ids desalineados, payloads incompletos) se detectan al instante.
+
+Para un entorno productivo, se recomienda **persistencia real**, **validación de duplicados** y **autenticación** para asociar calendarios a usuarios de forma robusta.
+
+---
+
+### Anexo A – Payloads de ejemplo
+
+**Create Calendar**
+
+```json
+{
+  "id": 20251016,
+  "name": "2025-10-16",
+  "description": "Calendario del día",
+  "color": "#1a73e8",
+  "user_id": 0
+}
+```
+
+**Create Event**
+
+```json
+{
+  "title": "Reunión",
+  "description": "Plan sprint",
+  "location": "Sala 2",
+  "calendar_id": 20251016
+}
+```
+
+**Create Time**
+
+```json
+{
+  "start_time": { "year":2025,"month":10,"day":16,"hour":9,"minute":0 },
+  "end_time":   { "year":2025,"month":10,"day":16,"hour":10,"minute":0 },
+  "event_id": 1
+}
+```
+
+**Get Calendar (día)**
+
+```
+GET /calendars/get_calendar_events_times/20251016
+```
+
+---
