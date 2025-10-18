@@ -7,9 +7,12 @@ class UserService:
         self.user_repository = user_repository
 
     def login_user(self, username: str, password: str) -> int | None:
-        user = self.user_repository.get_user_by_username(username)
-        if user and user.password == password:
-            return user.id
+        try:
+            user = self.user_repository.get_user_by_username(username)
+            if user and user.password == password:
+                return user.id
+        except Exception:
+            return None
         return None
 
     def get_all_users(self) -> list[User]:

@@ -5,7 +5,7 @@ from app.application.schemas.login_input_schema import loginInputSchema
 from app.domain.value_objects.create_user_schema import CreateUserSchema
 
 from app.domain.entities.User import User
-from typing import List
+from typing import List, Dict
 
 router = APIRouter()
 
@@ -29,11 +29,9 @@ def get_user_by_id(user_id: int, service: UserService = Depends(get_user_service
 def create_user(user: CreateUserSchema, service: UserService = Depends(get_user_service)):
     return service.create_user(user)
 
-@router.post("/login_user", response_model=bool, summary="Login user")
+@router.post("/login_user", response_model=int | None, summary="Login user")
 def login_user(login_data: loginInputSchema, service: UserService = Depends(get_user_service)):
-    if service.login_user(login_data.username, login_data.password):
-        return True
-    return False
+    return service.login_user(login_data.username, login_data.password)
 
 @router.put("/update_user/{user_id}", response_model=User, summary="Update user by ID")
 def update_user(user_id: int, user: User, service: UserService = Depends(get_user_service)):
