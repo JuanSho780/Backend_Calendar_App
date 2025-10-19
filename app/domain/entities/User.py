@@ -5,3 +5,4 @@ class User(BaseModel):
     name: str
     email: str
     password: str
+    is_verified: bool

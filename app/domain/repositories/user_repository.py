@@ -22,6 +22,18 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
+    def get_verification_code(self, user_id: int) -> Optional[str]:
+        pass
+
+    @abstractmethod
+    def update_verification_code(self, user_id: int, verification_code: str | None) -> None:
+        pass
+
+    @abstractmethod
+    def update_is_verified(self, user_id: int, is_verified: bool) -> None:
+        pass
+
+    @abstractmethod
     def update_user(self, user_id: int, user: User) -> Optional[User]: #in update we can use CreateUserSchema
         pass
 
