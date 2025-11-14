@@ -1,7 +1,10 @@
 from app.domain.repositories.user_repository import UserRepository
 from app.domain.entities.User import User
 from typing import List, Optional
+
 from app.domain.value_objects.create_user_schema import CreateUserSchema
+from app.domain.value_objects.update_user_basic_info import UpdateUserBasicInfoSchema
+
 from app.infrastructure.database.db_connection_factory import DBConnectionFactory # for db connection
 from fastapi import HTTPException
 
@@ -149,14 +152,14 @@ class UserRepositoryImpl(UserRepository):
         finally:
             DBConnectionFactory.release_connection(connection)
 
-    def update_user(self, user_id: int, user: User) -> Optional[User]:
+    def update_user(self, user_id: int, user: UpdateUserBasicInfoSchema) -> Optional[UpdateUserBasicInfoSchema]:
         connection = DBConnectionFactory.get_connection()
 
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "UPDATE users SET name = %s, email = %s, password = %s WHERE id = %s",
-                    (user.name, user.email, user.password, user_id)
+                    "UPDATE users SET name = %s, email = %s WHERE id = %s",
+                    (user.name, user.email, user_id)
                 )
                 connection.commit()
                 return user
@@ -169,6 +172,17 @@ class UserRepositoryImpl(UserRepository):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+                connection.commit()
+                return cursor.rowcount > 0
+        finally:
+            DBConnectionFactory.release_connection(connection)
+
+    def change_password(self, user_id: int, new_hashed_password: str) -> bool:
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE users SET password = %s WHERE id = %s", (new_hashed_password, user_id))
                 connection.commit()
                 return cursor.rowcount > 0
         finally:

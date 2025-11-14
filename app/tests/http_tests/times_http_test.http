@@ -1,57 +1,56 @@
 ### 1. Create time by event -> for calendar -> for auth user in JWT
 POST http://127.0.0.1:8000/times/create_time
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Authorization: Bearer your_jwt_token_here
 Content-Type: application/json
 
 {
   "start_time": {
-    "day": 19,
+    "day": 17,
     "month": 11,
     "year": 2025,
     "hour": 10,
-    "minute": 0
+    "minute": 30
   },
   "end_time": {
-    "day": 19,
+    "day": 17,
     "month": 11,
     "year": 2025,
-    "hour": 13,
+    "hour": 11,
     "minute": 0
   },
-  "event_id": 16
+  "event_id": 17
 }
 
 ### 2. Get all times by event -> for calendar -> for auth user in JWT
-GET http://127.0.0.1:8000/times/get_all_times/15
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+GET http://127.0.0.1:8000/times/get_all_times/17
+Authorization: Bearer your_jwt_token_here
 
 ### 3. Get specific time by event -> for caledar -> for auth user in JWT
 GET http://127.0.0.1:8000/times/get_time/14
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
-
+Authorization: Bearer your_jwt_token_here
 ### 4. Update specific time -> for event -> for calendar -> for auth user in JWT
 PUT http://127.0.0.1:8000/times/update_time/14
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Authorization: Bearer your_jwt_token_here
 Content-Type: application/json
 
 {
   "start_time": {
-    "day": 19,
+    "day": 17,
     "month": 11,
     "year": 2025,
-    "hour": 7,
-    "minute": 0
+    "hour": 10,
+    "minute": 30
   },
   "end_time": {
-    "day": 19,
+    "day": 17,
     "month": 11,
     "year": 2025,
-    "hour": 13,
+    "hour": 11,
     "minute": 0
   },
-  "event_id": 15
+  "event_id": 17
 }
 
 ### 5. Delete specific time -> for event -> for calendar -> for auth user in JWT
 DELETE http://127.0.0.1:8000/times/delete_time/14
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Authorization: Bearer your_jwt_token_here

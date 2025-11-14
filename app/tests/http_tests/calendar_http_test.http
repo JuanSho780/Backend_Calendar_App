@@ -1,25 +1,25 @@
 ### 1. Create calendar by user in JWT
 POST http://127.0.0.1:8000/calendars/create_calendar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Authorization: Bearer your_jwt_token_here
 Content-Type: application/json
 
 {
-    "name": "Ulima calendario",
-    "description": "Clases de la universidad",
-    "color": "Orange"
+    "name": "ABB calendar",
+    "description": "Reuniones de trabajo",
+    "color": "Red"
 }
 
 ### 2. Get all calendars by user in JWT
 GET http://127.0.0.1:8000/calendars/get_all_calendars/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Authorization: Bearer your_jwt_token_here
 
 ### 3. Get specific calendar by user in JWT
-GET http://127.0.0.1:8000/calendars/get_calendar/9
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+GET http://127.0.0.1:8000/calendars/get_calendar/11
+Authorization: Bearer your_jwt_token_here
 
 ### 4. Update specific calendar by user in JWT
 PUT http://127.0.0.1:8000/calendars/update_calendar/9
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Authorization: Bearer your_jwt_token_here
 Content-Type: application/json
 
 {
@@ -30,8 +30,8 @@ Content-Type: application/json
 
 ### 5. Delete specific calendar by user in JWT
 DELETE http://127.0.0.1:8000/calendars/delete_calendar/9
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Authorization: Bearer your_jwt_token_here
 
 ### 5. Get calendar and its events and times for a specific user (in JWT)
-GET http://127.0.0.1:8000/calendars/get_calendar_events_times/10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+GET http://127.0.0.1:8000/calendars/get_calendar_events_times/11
+Authorization: Bearer your_jwt_token_here

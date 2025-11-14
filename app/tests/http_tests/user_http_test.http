@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
     "email": "example@gmail.com",
-    "password": "example"
+    "password": "123456789"
 }
 
 ### 2. Log In (second step) -> Get auth token JWT
@@ -13,9 +13,32 @@ Content-Type: application/json
 
 {
     "email": "example@gmail.com",
-    "verification_code": "754084"
+    "verification_code": "462987"
 }
 
 ### 4. Get user simple petition using JWT in header
 GET http://127.0.0.1:8000/users/get_user/me
-Authorization: Bearer your-token-here
+Authorization: Bearer your_jwt_token_here
+
+### 5. Update user info using JWT in header
+PUT http://127.0.0.1:8000/users/update_user/me
+Authorization: Bearer your_jwt_token_here
+Content-Type: application/json
+
+{
+    "name": "Juan Zavalaga",
+    "email": "example@gmail.com"
+}
+
+### 6. Change user password using JWT in header
+PUT http://127.0.0.1:8000/users/change_password/me
+Authorization: Bearer your_jwt_token_here
+Content-Type: application/json
+
+{
+    "password": "123456789"
+}
+
+### 7. Get ALL info (calendars, events, times) by user using JWT in header
+GET http://127.0.0.1:8000/users/get_user_calendars_events_times/me
+Authorization: Bearer your_jwt_token_here

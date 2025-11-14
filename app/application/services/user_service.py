@@ -5,6 +5,8 @@ from app.domain.value_objects.create_user_schema import CreateUserSchema
 
 from app.authentication.password import verify_password, get_password_hash
 
+from app.domain.value_objects.update_user_basic_info import UpdateUserBasicInfoSchema
+
 class UserService:
     def __init__(self, user_repository: UserRepository, mail_sending_api: MailSendingAPI): # Dependency Injection
         self.user_repository = user_repository
@@ -65,8 +67,12 @@ class UserService:
             return True
         return False
 
-    def update_user(self, user_id: int, user: CreateUserSchema) -> User:
+    def update_user(self, user_id: int, user: UpdateUserBasicInfoSchema) -> UpdateUserBasicInfoSchema:
         return self.user_repository.update_user(user_id, user)
 
     def delete_user(self, user_id: int) -> bool:
         return self.user_repository.delete_user(user_id)
+    
+    def change_password(self, user_id: int, new_password: str) -> bool:
+        hashed_password = get_password_hash(new_password)
+        return self.user_repository.change_password(user_id, hashed_password)

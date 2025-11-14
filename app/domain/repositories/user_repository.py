@@ -44,3 +44,7 @@ class UserRepository(ABC):
     @abstractmethod
     def delete_user(self, user_id: int) -> bool:
         pass
+
+    @abstractmethod
+    def change_password(self, user_id: int, new_hashed_password: str) -> bool:
+        pass
