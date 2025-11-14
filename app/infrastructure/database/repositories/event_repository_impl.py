@@ -67,7 +67,7 @@ class EventRepositoryImpl(EventRepository):
         finally:
             DBConnectionFactory.release_connection(connection)
 
-    def update_event(self, event_id: int, event: Event) -> Optional[Event]:
+    def update_event(self, event_id: int, event: CreateEventSchema) -> Optional[CreateEventSchema]:
         connection = DBConnectionFactory.get_connection()
 
         try:

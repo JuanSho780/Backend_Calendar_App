@@ -1,0 +1,35 @@
+### 1. Create event by calendar -> for auth user in JWT
+POST http://127.0.0.1:8000/events/create_event
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Content-Type: application/json
+
+{
+    "title": "Clase Software II",
+    "description": "Curso 8vo ciclo",
+    "location": "O2-402",
+    "calendar_id": 10
+}
+
+### 2. Get all events by calendar -> for auth user in JWT
+GET http://127.0.0.1:8000/events/get_all_events/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+
+### 3. Get specific event by calendar -> for auth user in JWT
+GET http://127.0.0.1:8000/events/get_event/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+
+### 4. Update specific event -> for auth user in JWT
+PUT http://127.0.0.1:8000/events/update_event/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Content-Type: application/json
+
+{
+    "title": "Clase Software 2",
+    "description": "Curso 8vo ciclo",
+    "location": "O2-402",
+    "calendar_id": 10
+}
+
+### 5. Delete specific event -> for auth user in JWT
+DELETE http://127.0.0.1:8000/events/delete_event/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs

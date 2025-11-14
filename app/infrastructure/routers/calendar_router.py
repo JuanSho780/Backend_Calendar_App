@@ -15,6 +15,7 @@ from app.domain.value_objects.create_calendar_schema_principal import CreateCale
 
 from app.application.schemas.calendar_events_times import CalendarEventsTimesSchema
 from app.domain.entities.Calendar import Calendar
+from app.domain.entities.User import User
 from typing import List
 
 from app.authentication.services.auth_service import get_current_user
@@ -38,11 +39,11 @@ def res_root():
     return {"message": "Welcome to the Calendar Router"}
 
 @router.get("/get_all_calendars/me", response_model=List[Calendar], summary= "Get all calendars for a user")
-def get_all_calendars(service: CalendarService = Depends(get_calendar_service), current_user: Calendar = Depends(get_current_user)):
+def get_all_calendars(service: CalendarService = Depends(get_calendar_service), current_user: User = Depends(get_current_user)):
     return service.get_all_calendars_by_user(current_user.id)
 
 @router.get("/get_calendar/{calendar_id}", response_model=Calendar, summary="Get calendar by ID")
-def get_calendar_by_id(calendar_id: int, service: CalendarService = Depends(get_calendar_service), current_user: Calendar = Depends(get_current_user)):
+def get_calendar_by_id(calendar_id: int, service: CalendarService = Depends(get_calendar_service), current_user: User = Depends(get_current_user)):
     calendar = service.get_calendar_by_id(calendar_id)
     if calendar.user_id != current_user.id:
         raise HTTPException(
@@ -53,7 +54,7 @@ def get_calendar_by_id(calendar_id: int, service: CalendarService = Depends(get_
     return calendar
 
 @router.get("/get_calendar_events_times/{calendar_id}", response_model=CalendarEventsTimesSchema, summary="Get calendar with its events and times by calendar ID")
-def get_calendar_events_times(calendar_id: int, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service), current_user: Calendar = Depends(get_current_user)):
+def get_calendar_events_times(calendar_id: int, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service), current_user: User = Depends(get_current_user)):
     calendar = calendar_service.get_calendar_by_id(calendar_id)
     if calendar.user_id != current_user.id:
         raise HTTPException(
@@ -70,7 +71,7 @@ def get_calendar_events_times(calendar_id: int, calendar_service: CalendarServic
     return CalendarEventsTimesSchema(calendar=calendar, events_times=event_times)
 
 @router.post("/create_calendar", response_model=Calendar, summary="Create a new calendar")
-def create_calendar(calendar: CreateCalendarSchemaPrincipal, service: CalendarService = Depends(get_calendar_service), current_user: Calendar = Depends(get_current_user)):
+def create_calendar(calendar: CreateCalendarSchemaPrincipal, service: CalendarService = Depends(get_calendar_service), current_user: User = Depends(get_current_user)):
     real_calendar = CreateCalendarSchema(
         name=calendar.name,
         description=calendar.description,
@@ -80,7 +81,7 @@ def create_calendar(calendar: CreateCalendarSchemaPrincipal, service: CalendarSe
     return service.create_calendar(real_calendar)
 
 @router.put("/update_calendar/{calendar_id}", response_model=CreateCalendarSchemaPrincipal, summary="Update calendar by ID")
-def update_calendar(calendar_id: int, calendar: CreateCalendarSchemaPrincipal, service: CalendarService = Depends(get_calendar_service), current_user: Calendar = Depends(get_current_user)):
+def update_calendar(calendar_id: int, calendar: CreateCalendarSchemaPrincipal, service: CalendarService = Depends(get_calendar_service), current_user: User = Depends(get_current_user)):
     calendar_now = service.get_calendar_by_id(calendar_id)
     if calendar_now.user_id != current_user.id:
         raise HTTPException(
@@ -96,7 +97,7 @@ def update_calendar(calendar_id: int, calendar: CreateCalendarSchemaPrincipal, s
     return service.update_calendar(calendar_id, calendar_update)
 
 @router.delete("/delete_calendar/{calendar_id}", response_model=bool, summary="Delete calendar by ID")
-def delete_calendar(calendar_id: int, service: CalendarService = Depends(get_calendar_service), current_user: Calendar = Depends(get_current_user)):
+def delete_calendar(calendar_id: int, service: CalendarService = Depends(get_calendar_service), current_user: User = Depends(get_current_user)):
     calendar_now = service.get_calendar_by_id(calendar_id)
     if calendar_now.user_id != current_user.id:
         raise HTTPException(
