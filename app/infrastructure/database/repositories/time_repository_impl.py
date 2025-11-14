@@ -1,5 +1,6 @@
 from app.domain.repositories.time_repository import TimeRepository
 from app.domain.entities.Time import Time
+from app.domain.value_objects.create_time_schema import CreateTimeSchema
 from typing import List, Optional
 from app.infrastructure.database.db_connection_factory import DBConnectionFactory # for db connection
 from fastapi import HTTPException
@@ -90,7 +91,7 @@ class TimeRepositoryImpl(TimeRepository):
         finally:
             DBConnectionFactory.release_connection(connection)
 
-    def update_time(self, time_id: int, time: Time) -> Optional[Time]:
+    def update_time(self, time_id: int, time: CreateTimeSchema) -> Optional[CreateTimeSchema]:
         connection = DBConnectionFactory.get_connection()
 
         try:
