@@ -6,3 +6,5 @@ python-dotenv
 sendgrid
 passlib
 argon2_cffi
+PyJWT
+bcrypt

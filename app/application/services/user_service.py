@@ -37,6 +37,15 @@ class UserService:
 
     def get_user_by_id(self, user_id: int) -> User:
         return self.user_repository.get_user_by_id(user_id)
+    
+    def get_user_by_email(self, email: str) -> User:
+        return self.user_repository.get_user_by_email(email)
+    
+    def get_verification_code(self, user_id: int) -> str | None:
+        return self.user_repository.get_verification_code(user_id)
+    
+    def update_verification_code(self, user_id: int, verification_code: str | None):
+        return self.user_repository.update_verification_code(user_id, verification_code)
 
     def create_user(self, user: CreateUserSchema) -> User:
         user.password = get_password_hash(user.password)

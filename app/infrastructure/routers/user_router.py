@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.infrastructure.database.repositories.user_repository_impl import UserRepositoryImpl
 from app.application.services.user_service import UserService
 from app.application.schemas.login_input_schema import loginInputSchema
@@ -7,7 +7,12 @@ from app.infrastructure.apis.mail_sending_api_impl import MailSendingAPIImpl
 from app.application.schemas.verification_input_schema import VerificationInputSchema
 
 from app.domain.entities.User import User
-from typing import List, Dict
+
+from app.authentication.models.token import Token
+from app.authentication.services.auth_service import authenticate_user, create_access_token
+from datetime import timedelta
+
+from typing import List
 
 router = APIRouter()
 
@@ -40,9 +45,24 @@ def validate_user(validate_data: VerificationInputSchema, service: UserService =
 def login_user(login_data: loginInputSchema, service: UserService = Depends(get_user_service)):
     return service.login_user(login_data.email, login_data.password)
 
-@router.post("/login_user_verification", response_model=int | None, summary="Login user verification (second step)")
-def login_user_verification(login_data: VerificationInputSchema, service: UserService = Depends(get_user_service)):
-    return service.login_user_verification(login_data.email, login_data.verification_code)
+@router.post("/login_user_verification", summary="Login user verification (second step)")
+async def login_user_verification(login_data: VerificationInputSchema, user_service: UserService = Depends(get_user_service)) -> Token:
+    #return service.login_user_verification(login_data.email, login_data.verification_code)
+    user = authenticate_user(login_data.email, login_data.verification_code, user_service)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token_expires = timedelta(minutes=1440)
+    access_token = create_access_token(
+        data = {"sub": user.email}, expires_delta=access_token_expires
+    )
+
+    user_service.update_verification_code(user.id, None)
+    return Token(access_token=access_token, token_type="bearer")
 
 @router.put("/update_user/{user_id}", response_model=User, summary="Update user by ID")
 def update_user(user_id: int, user: CreateUserSchema, service: UserService = Depends(get_user_service)):
