@@ -1,0 +1,21 @@
+### 1. Log In (first step)
+POST http://127.0.0.1:8000/users/login_user
+Content-Type: application/json
+
+{
+    "email": "example@gmail.com",
+    "password": "example"
+}
+
+### 2. Log In (second step) -> Get auth token JWT
+POST http://127.0.0.1:8000/users/login_user_verification
+Content-Type: application/json
+
+{
+    "email": "example@gmail.com",
+    "verification_code": "754084"
+}
+
+### 4. Get user simple petition using JWT in header
+GET http://127.0.0.1:8000/users/get_user/me
+Authorization: Bearer your-token-here

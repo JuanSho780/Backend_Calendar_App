@@ -15,10 +15,18 @@ from app.authentication.models.token import TokenData
 from app.application.services.user_service import UserService
 from app.authentication.password import verify_verification_code
 
+from app.infrastructure.apis.mail_sending_api_impl import MailSendingAPIImpl
+from app.infrastructure.database.repositories.user_repository_impl import UserRepositoryImpl
+
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
+
+def get_user_service():
+    mail_sending_api = MailSendingAPIImpl()
+    repository = UserRepositoryImpl()
+    return UserService(repository, mail_sending_api) #dependency injection
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='users/login_user_verification')
 
@@ -42,7 +50,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service: UserService):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], user_service: UserService = Depends(get_user_service)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

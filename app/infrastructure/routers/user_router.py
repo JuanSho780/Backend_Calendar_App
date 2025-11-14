@@ -9,7 +9,7 @@ from app.application.schemas.verification_input_schema import VerificationInputS
 from app.domain.entities.User import User
 
 from app.authentication.models.token import Token
-from app.authentication.services.auth_service import authenticate_user, create_access_token
+from app.authentication.services.auth_service import authenticate_user, create_access_token, get_current_user
 from datetime import timedelta
 
 from typing import List
@@ -29,9 +29,16 @@ def res_root():
 def get_all_users(service: UserService = Depends(get_user_service)):
     return service.get_all_users()
 
-@router.get("/get_user/{user_id}", response_model=User, summary="Get user by ID")
-def get_user_by_id(user_id: int, service: UserService = Depends(get_user_service)):
-    return service.get_user_by_id(user_id)
+@router.get("/get_user/me", response_model=User, summary="Get user by ID")
+def get_user_by_id(service: UserService = Depends(get_user_service), current_user: User = Depends(get_current_user)):
+    if not current_user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not verified",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return service.get_user_by_id(current_user.id)
 
 @router.post("/create_user", response_model=User, summary="Create a new user (first step)")
 def create_user(user: CreateUserSchema, service: UserService = Depends(get_user_service)):
@@ -64,10 +71,10 @@ async def login_user_verification(login_data: VerificationInputSchema, user_serv
     user_service.update_verification_code(user.id, None)
     return Token(access_token=access_token, token_type="bearer")
 
-@router.put("/update_user/{user_id}", response_model=User, summary="Update user by ID")
-def update_user(user_id: int, user: CreateUserSchema, service: UserService = Depends(get_user_service)):
-    return service.update_user(user_id, user)
+@router.put("/update_user/me", response_model=User, summary="Update user by ID")
+def update_user(user: CreateUserSchema, service: UserService = Depends(get_user_service), current_user: User = Depends(get_current_user)):
+    return service.update_user(current_user.id, user)
 
-@router.delete("/delete_user/{user_id}", response_model=bool, summary="Delete user by ID")
-def delete_user(user_id: int, service: UserService = Depends(get_user_service)):
-    return service.delete_user(user_id)
+@router.delete("/delete_user/me", response_model=bool, summary="Delete user by ID")
+def delete_user(service: UserService = Depends(get_user_service), current_user: User = Depends(get_current_user)):
+    return service.delete_user(current_user.id)
