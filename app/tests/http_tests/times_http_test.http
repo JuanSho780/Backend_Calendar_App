@@ -8,17 +8,17 @@ Content-Type: application/json
     "day": 19,
     "month": 11,
     "year": 2025,
-    "hour": 7,
+    "hour": 10,
     "minute": 0
   },
   "end_time": {
     "day": 19,
     "month": 11,
     "year": 2025,
-    "hour": 10,
+    "hour": 13,
     "minute": 0
   },
-  "event_id": 15
+  "event_id": 16
 }
 
 ### 2. Get all times by event -> for calendar -> for auth user in JWT

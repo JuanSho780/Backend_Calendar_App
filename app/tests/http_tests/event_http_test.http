@@ -4,9 +4,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsY
 Content-Type: application/json
 
 {
-    "title": "Clase Software II",
-    "description": "Curso 8vo ciclo",
-    "location": "O2-402",
+    "title": "Clase ADA",
+    "description": "Curso 8vo ciclo algoritmos",
+    "location": "O2-202",
     "calendar_id": 10
 }
 
@@ -19,7 +19,7 @@ GET http://127.0.0.1:8000/events/get_event/14
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
 
 ### 4. Update specific event -> for auth user in JWT
-PUT http://127.0.0.1:8000/events/update_event/14
+PUT http://127.0.0.1:8000/events/update_event/16
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
 Content-Type: application/json
 
@@ -32,4 +32,8 @@ Content-Type: application/json
 
 ### 5. Delete specific event -> for auth user in JWT
 DELETE http://127.0.0.1:8000/events/delete_event/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+
+### 6. Get events and its times event by calendar -> for auth user in JWT
+GET http://127.0.0.1:8000/events/get_event_times/15
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs

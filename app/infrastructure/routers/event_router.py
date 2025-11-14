@@ -60,21 +60,19 @@ def get_event_by_id(event_id: int, calendar_service: CalendarService = Depends(g
         )
     return event_service.get_event_by_id(event_id)
 
-@router.get("/get_event_times/{calendar_id}", response_model=List[EventTimesSchema], summary="Get event with times by calendar ID")
-def get_event_times_by_calendar(calendar_id: int, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service), current_user: User = Depends(get_current_user)):
-    actual_calendar = calendar_service.get_calendar_by_id(calendar_id)
+@router.get("/get_event_times/{event_id}", response_model=List[EventTimesSchema], summary="Get event with times by calendar ID")
+def get_event_times_by_calendar(event_id: int, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service), current_user: User = Depends(get_current_user)):
+    actual_event = event_service.get_event_by_id(event_id)
+    actual_calendar = calendar_service.get_calendar_by_id(actual_event.calendar_id)
     if actual_calendar.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User is not authorized to view events of this calendar",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    events = event_service.get_all_events_by_calendar(calendar_id)
-    event_times = []
-    for event in events:
-        times = time_service.get_all_times_by_event(event.id)
-        event_times.append(EventTimesSchema(id_calendar=event.calendar_id, event=event, times=times))
-    return event_times
+    event = event_service.get_event_by_id(event_id)
+    times = time_service.get_all_times_by_event(event_id)
+    return [EventTimesSchema(id_calendar=event.calendar_id, event=event, times=times)]
 
 @router.post("/create_event", response_model=Event, summary="Create a new event")
 def create_event(event: CreateEventSchema, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), current_user: User = Depends(get_current_user)):

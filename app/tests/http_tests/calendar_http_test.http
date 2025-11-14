@@ -31,3 +31,7 @@ Content-Type: application/json
 ### 5. Delete specific calendar by user in JWT
 DELETE http://127.0.0.1:8000/calendars/delete_calendar/9
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+
+### 5. Get calendar and its events and times for a specific user (in JWT)
+GET http://127.0.0.1:8000/calendars/get_calendar_events_times/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
