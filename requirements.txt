@@ -4,3 +4,5 @@ psycopg2[binary]
 sqlalchemy
 python-dotenv
 sendgrid
+passlib
+argon2_cffi

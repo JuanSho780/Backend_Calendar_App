@@ -3,6 +3,8 @@ from app.domain.apis.mail_sending_api import MailSendingAPI
 from app.domain.entities.User import User
 from app.domain.value_objects.create_user_schema import CreateUserSchema
 
+from app.authentication.password import verify_password, get_password_hash
+
 class UserService:
     def __init__(self, user_repository: UserRepository, mail_sending_api: MailSendingAPI): # Dependency Injection
         self.user_repository = user_repository
@@ -11,7 +13,7 @@ class UserService:
     def login_user(self, username: str, password: str) -> bool:
         try:
             user = self.user_repository.get_user_by_username(username)
-            if user and user.password == password:
+            if user and verify_password(password, user.password):
                 verification_code = self.mail_sending_api.send_verification_email(user.email)
                 if verification_code is not None:
                     self.user_repository.update_verification_code(user.id, verification_code)
@@ -37,6 +39,7 @@ class UserService:
         return self.user_repository.get_user_by_id(user_id)
 
     def create_user(self, user: CreateUserSchema) -> User:
+        user.password = get_password_hash(user.password)
         user_complete = self.user_repository.create_user(user)
         verification_code = self.mail_sending_api.send_verification_email(user_complete.email)
 

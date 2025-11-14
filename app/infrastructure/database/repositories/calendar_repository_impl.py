@@ -52,8 +52,8 @@ class CalendarRepositoryImpl(CalendarRepository):
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO calendars (name, description, color, user_id) VALUES (%s, %s, %s, %s) RETURNING id",
-                    (calendar.name, calendar.description, calendar.color, calendar.user_id)
+                    "INSERT INTO calendars (id, name, description, color, user_id) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+                    (calendar.id, calendar.name, calendar.description, calendar.color, calendar.user_id)#añadi id aca, luego lo eliminas
                 )
                 calendar_id = cursor.fetchone()[0]
                 connection.commit()
