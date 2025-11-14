@@ -53,8 +53,15 @@ def get_calendar_by_id(calendar_id: int, service: CalendarService = Depends(get_
     return calendar
 
 @router.get("/get_calendar_events_times/{calendar_id}", response_model=CalendarEventsTimesSchema, summary="Get calendar with its events and times by calendar ID")
-def get_calendar_events_times(calendar_id: int, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service)):
+def get_calendar_events_times(calendar_id: int, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service), current_user: Calendar = Depends(get_current_user)):
     calendar = calendar_service.get_calendar_by_id(calendar_id)
+    if calendar.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not authorized to access this calendar",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     events = event_service.get_all_events_by_calendar(calendar_id)
     event_times = []
     for event in events:
