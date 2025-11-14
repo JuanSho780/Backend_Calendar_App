@@ -7,6 +7,26 @@ from fastapi import HTTPException
 
 class UserRepositoryImpl(UserRepository):
 
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT id, name, email, password, is_verified FROM users WHERE email = %s", (email,))
+                user_data = cursor.fetchone()
+                if user_data:
+                    return User(
+                        id=user_data[0],
+                        name=user_data[1],
+                        email=user_data[2],
+                        password=user_data[3],
+                        is_verified=user_data[4]
+                    )
+                else:
+                    raise HTTPException(status_code=404, detail="User not found")
+        finally:
+            DBConnectionFactory.release_connection(connection)
+
     def get_user_by_username(self, username: str) -> Optional[User]:
         connection = DBConnectionFactory.get_connection()
 

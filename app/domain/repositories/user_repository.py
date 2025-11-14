@@ -1,10 +1,14 @@
-#ABC use for defining abstract base classes
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from app.domain.entities.User import User
 from app.domain.value_objects.create_user_schema import CreateUserSchema
 
 class UserRepository(ABC):
+
+    @abstractmethod
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        pass
+
     @abstractmethod
     def get_user_by_username(self, username: str) -> Optional[User]:
         pass

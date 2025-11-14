@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 class VerificationInputSchema(BaseModel):
-    user_name: str
+    email: str
     verification_code: str

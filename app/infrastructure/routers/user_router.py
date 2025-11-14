@@ -34,15 +34,15 @@ def create_user(user: CreateUserSchema, service: UserService = Depends(get_user_
 
 @router.post("/validate_user", response_model=bool, summary="Validate user (second step)")
 def validate_user(validate_data: VerificationInputSchema, service: UserService = Depends(get_user_service)):
-    return service.validate_user_is_verified(validate_data.user_name, validate_data.verification_code)
+    return service.validate_user_is_verified(validate_data.email, validate_data.verification_code)
 
 @router.post("/login_user", response_model=bool, summary="Login user (first step)")
 def login_user(login_data: loginInputSchema, service: UserService = Depends(get_user_service)):
-    return service.login_user(login_data.username, login_data.password)
+    return service.login_user(login_data.email, login_data.password)
 
 @router.post("/login_user_verification", response_model=int | None, summary="Login user verification (second step)")
 def login_user_verification(login_data: VerificationInputSchema, service: UserService = Depends(get_user_service)):
-    return service.login_user_verification(login_data.user_name, login_data.verification_code)
+    return service.login_user_verification(login_data.email, login_data.verification_code)
 
 @router.put("/update_user/{user_id}", response_model=User, summary="Update user by ID")
 def update_user(user_id: int, user: CreateUserSchema, service: UserService = Depends(get_user_service)):
