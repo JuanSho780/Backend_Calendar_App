@@ -1,0 +1,33 @@
+### 1. Create calendar by user in JWT
+POST http://127.0.0.1:8000/calendars/create_calendar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Content-Type: application/json
+
+{
+    "name": "Ulima calendario",
+    "description": "Clases de la universidad",
+    "color": "Orange"
+}
+
+### 2. Get all calendars by user in JWT
+GET http://127.0.0.1:8000/calendars/get_all_calendars/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+
+### 3. Get specific calendar by user in JWT
+GET http://127.0.0.1:8000/calendars/get_calendar/9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+
+### 4. Update specific calendar by user in JWT
+PUT http://127.0.0.1:8000/calendars/update_calendar/9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs
+Content-Type: application/json
+
+{
+    "name": "Ulima calendar",
+    "description": "Clases de la U",
+    "color": "Orange"
+}
+
+### 5. Delete specific calendar by user in JWT
+DELETE http://127.0.0.1:8000/calendars/delete_calendar/9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjMyMzAwNTl9.3dIgO--28_Toh0co5X6MF1CwBJ7SWPlKc2Gm02IfGrs

@@ -2,6 +2,7 @@ from app.domain.repositories.calendar_repository import CalendarRepository
 from app.domain.entities.Calendar import Calendar
 from typing import List, Optional
 from app.domain.value_objects.create_calendar_schema import CreateCalendarSchema
+from app.domain.value_objects.create_calendar_schema_principal import CreateCalendarSchemaPrincipal
 from app.infrastructure.database.db_connection_factory import DBConnectionFactory # for db connection
 from fastapi import HTTPException
 
@@ -52,8 +53,8 @@ class CalendarRepositoryImpl(CalendarRepository):
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO calendars (id, name, description, color, user_id) VALUES (%s, %s, %s, %s, %s) RETURNING id",
-                    (calendar.id, calendar.name, calendar.description, calendar.color, calendar.user_id)#añadi id aca, luego lo eliminas
+                    "INSERT INTO calendars (name, description, color, user_id) VALUES (%s, %s, %s, %s) RETURNING id",
+                    (calendar.name, calendar.description, calendar.color, calendar.user_id)
                 )
                 calendar_id = cursor.fetchone()[0]
                 connection.commit()
@@ -67,14 +68,14 @@ class CalendarRepositoryImpl(CalendarRepository):
         finally:
             DBConnectionFactory.release_connection(connection)
 
-    def update_calendar(self, calendar_id: int, calendar: Calendar) -> Optional[Calendar]:
+    def update_calendar(self, calendar_id: int, calendar: CreateCalendarSchemaPrincipal) -> Optional[CreateCalendarSchemaPrincipal]:
         connection = DBConnectionFactory.get_connection()
 
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "UPDATE calendars SET name = %s, description = %s, color = %s, user_id = %s WHERE id = %s",
-                    (calendar.name, calendar.description, calendar.color, calendar.user_id, calendar_id)
+                    "UPDATE calendars SET name = %s, description = %s, color = %s WHERE id = %s",
+                    (calendar.name, calendar.description, calendar.color, calendar_id)
                 )
                 connection.commit()
                 return calendar

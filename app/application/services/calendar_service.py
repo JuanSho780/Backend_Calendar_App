@@ -1,6 +1,7 @@
 from app.domain.repositories.calendar_repository import CalendarRepository
 from app.domain.entities.Calendar import Calendar
 from app.domain.value_objects.create_calendar_schema import CreateCalendarSchema
+from app.domain.value_objects.create_calendar_schema_principal import CreateCalendarSchemaPrincipal
 
 class CalendarService:
     def __init__(self, calendar_repository: CalendarRepository): # Dependency Injection
@@ -15,7 +16,7 @@ class CalendarService:
     def create_calendar(self, calendar: CreateCalendarSchema) -> Calendar:
         return self.calendar_repository.create_calendar(calendar)
 
-    def update_calendar(self, calendar_id: int, calendar: Calendar) -> Calendar:
+    def update_calendar(self, calendar_id: int, calendar: CreateCalendarSchemaPrincipal) -> CreateCalendarSchemaPrincipal:
         return self.calendar_repository.update_calendar(calendar_id, calendar)
 
     def delete_calendar(self, calendar_id: int) -> bool:
