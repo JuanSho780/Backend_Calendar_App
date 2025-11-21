@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 
+from datetime import datetime
+
 class DateTime(BaseModel):
 
     day: int = Field(..., description="Day of the month")
@@ -8,6 +10,12 @@ class DateTime(BaseModel):
     hour: int = Field(..., description="Hour of the day")
     minute: int = Field(..., description="Minute of the hour")
         
+    def to_native(self) -> datetime:
+        """Convierte este objeto a un datetime nativo de Python"""
+        return datetime(
+            self.year, self.month, self.day, self.hour, self.minute
+        )
+    
     @field_validator('day')
     def validate_day(cls, day):
         if not (1 <= day <= 31):

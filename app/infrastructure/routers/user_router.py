@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.infrastructure.apis.apscheduler_back_impl import AppSchedulerBackImpl
+
 from app.infrastructure.database.repositories.user_repository_impl import UserRepositoryImpl
 from app.application.services.user_service import UserService
 
@@ -46,7 +48,9 @@ def get_event_service():
 
 def get_time_service():
     repository = TimeRepositoryImpl()
-    return TimeService(repository) #dependency injection
+    scheduler = AppSchedulerBackImpl.get_scheduler()
+    mail_api = MailSendingAPIImpl()
+    return TimeService(repository, scheduler, mail_api) #dependency injection
 
 def get_user_service():
     mail_sending_api = MailSendingAPIImpl()

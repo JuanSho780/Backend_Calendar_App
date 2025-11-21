@@ -18,6 +18,9 @@ from typing import List
 
 from app.authentication.services.auth_service import get_current_user
 
+from app.infrastructure.apis.apscheduler_back_impl import AppSchedulerBackImpl
+from app.infrastructure.apis.mail_sending_api_impl import MailSendingAPIImpl
+
 router = APIRouter()
 
 def get_calendar_service():
@@ -26,7 +29,9 @@ def get_calendar_service():
 
 def get_time_service():
     repository = TimeRepositoryImpl()
-    return TimeService(repository) #dependency injection
+    scheduler = AppSchedulerBackImpl.get_scheduler()
+    mail_api = MailSendingAPIImpl()
+    return TimeService(repository, scheduler, mail_api) #dependency injection
 
 def get_event_service():
     repository = EventRepositoryImpl()

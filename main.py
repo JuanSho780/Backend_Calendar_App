@@ -8,6 +8,8 @@ from app.infrastructure.routers.time_router import router as time_router
 
 from app.infrastructure.database.db_connection_factory import DBConnectionFactory
 
+from app.infrastructure.apis.apscheduler_back_impl import AppSchedulerBackImpl
+
 app = FastAPI()
 
 origins = [
@@ -30,10 +32,14 @@ def startup():
     print("Starting up connection pool...")
     DBConnectionFactory.initialize()
 
+    print("Starting scheduler...")
+    AppSchedulerBackImpl.initialize()
+
 @app.on_event("shutdown")
 def shutdown():
     print("Shutting down connection pool...")
     DBConnectionFactory.close_pool()
+    AppSchedulerBackImpl.get_scheduler().shutdown()
 
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(calendar_router, prefix="/calendars", tags=["calendars"])

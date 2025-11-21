@@ -15,6 +15,9 @@ from typing import List
 
 from app.authentication.services.auth_service import get_current_user
 
+from app.infrastructure.apis.apscheduler_back_impl import AppSchedulerBackImpl
+from app.infrastructure.apis.mail_sending_api_impl import MailSendingAPIImpl
+
 router = APIRouter()
 
 def get_calendar_service():
@@ -27,7 +30,9 @@ def get_event_service():
 
 def get_time_service():
     repository = TimeRepositoryImpl()
-    return TimeService(repository) #dependency injection
+    scheduler = AppSchedulerBackImpl.get_scheduler()
+    mail_api = MailSendingAPIImpl()
+    return TimeService(repository, scheduler, mail_api) #dependency injection
 
 @router.get("/")
 def res_root():
@@ -68,7 +73,11 @@ def create_time(time: CreateTimeSchema, calendar_service: CalendarService = Depe
             detail="User is not authorized to create time for this event",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return time_service.create_time(time)
+    
+    #pass other args
+    user_email = current_user.email
+    user_name = current_user.name
+    return time_service.create_time(time, user_email, user_name, actual_event.title)
 
 @router.put("/update_time/{time_id}", response_model=CreateTimeSchema, summary="Update a time entry by its ID")
 def update_time(time_id: int, time: CreateTimeSchema, calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service), current_user = Depends(get_current_user)):
