@@ -1,11 +1,9 @@
 from fastapi import HTTPException
-import os
 
 from app.domain.apis.gemini_client import GeminiClient
-from typing import Dict, Any, List, Type
+from typing import Type
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
 from langchain.messages import SystemMessage, HumanMessage
 
 from app.domain.structured_schemas.calendar_llm_out_schema import CalendarLLMOutputSchema
@@ -16,8 +14,6 @@ class GeminiClientImpl(GeminiClient):
     def __init__(self, model_name: str = "gemini-2.5-flash"):
         try:
             self.model_name = model_name
-
-            google_api_key = os.getenv("GOOGLE_API_KEY")
 
             self.llm = ChatGoogleGenerativeAI(
                 model=self.model_name,

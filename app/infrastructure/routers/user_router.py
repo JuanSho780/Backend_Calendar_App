@@ -67,7 +67,7 @@ def get_all_users(service: UserService = Depends(get_user_service)):
     return service.get_all_users()
 
 @router.get("/get_user/me", response_model=ReturnUserSchema, summary="Get user by ID")
-def get_user_by_id(service: UserService = Depends(get_user_service), current_user: User = Depends(get_current_user)):
+def get_user_by_id(current_user: User = Depends(get_current_user)):
     if not current_user.is_verified:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -112,7 +112,7 @@ def create_user(user: CreateUserSchema, service: UserService = Depends(get_user_
     new_user = service.create_user(user)
     
     new_calendar = CreateCalendarSchema(
-        name="PlanyfyMe events",
+        name="PlanifyMe events",
         description="Here are all the events that PlanifyMe Assistant create to you",
         color="#B2EBF2",
         user_id=new_user.id,
@@ -131,7 +131,6 @@ def login_user(login_data: loginInputSchema, service: UserService = Depends(get_
 
 @router.post("/login_user_verification", summary="Login user verification (second step)")
 async def login_user_verification(login_data: VerificationInputSchema, user_service: UserService = Depends(get_user_service)) -> Token:
-    #return service.login_user_verification(login_data.email, login_data.verification_code)
     user = authenticate_user(login_data.email, login_data.verification_code, user_service)
     if not user:
         raise HTTPException(

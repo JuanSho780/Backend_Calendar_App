@@ -10,8 +10,6 @@ from app.infrastructure.database.repositories.time_repository_impl import TimeRe
 from app.infrastructure.apis.apscheduler_back_impl import AppSchedulerBackImpl
 from app.infrastructure.apis.mail_sending_api_impl import MailSendingAPIImpl
 
-from typing import Any, Dict, Optional, List
-
 from app.infrastructure.apis.gemini_client_impl import GeminiClientImpl
 
 from app.domain.value_objects.create_event_schema import CreateEventSchema
