@@ -15,3 +15,9 @@ Content-Type: application/json
 {
     "user_query": "Hola, quién eres?"
 }
+
+###
+
+GET http://127.0.0.1:8000/agent
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjM5NDc4NDh9.2OEMvBx_8_mXOssBCB-QpyoUPWg7xyNmL7qw799q8zw
+Content-Type: application/json
