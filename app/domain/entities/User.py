@@ -6,3 +6,4 @@ class User(BaseModel):
     email: str
     password: str
     is_verified: bool
+    planifyme_calendar_id: int

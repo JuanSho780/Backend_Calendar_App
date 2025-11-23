@@ -9,3 +9,8 @@ argon2_cffi
 PyJWT
 bcrypt
 apscheduler
+uvicorn
+langgraph
+httpx
+langchain-google-genai
+langchain

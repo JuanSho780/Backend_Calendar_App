@@ -70,6 +70,9 @@ class UserService:
     def update_user(self, user_id: int, user: UpdateUserBasicInfoSchema) -> UpdateUserBasicInfoSchema:
         return self.user_repository.update_user(user_id, user)
 
+    def update_planifyme_calendar_id(self, user_id: int, id_to_change: int):
+        return self.user_repository.update_planifyme_calendar_id(user_id, id_to_change)
+
     def delete_user(self, user_id: int) -> bool:
         return self.user_repository.delete_user(user_id)
     

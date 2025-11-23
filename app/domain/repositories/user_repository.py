@@ -38,6 +38,10 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
+    def update_planifyme_calendar_id(self, user_id: int, id_to_change: int) -> None:
+        pass
+
+    @abstractmethod
     def update_user(self, user_id: int, user: User) -> Optional[User]: #in update we can use CreateUserSchema
         pass
 

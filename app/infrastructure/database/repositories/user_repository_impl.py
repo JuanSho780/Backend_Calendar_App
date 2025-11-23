@@ -15,7 +15,7 @@ class UserRepositoryImpl(UserRepository):
 
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT id, name, email, password, is_verified FROM users WHERE email = %s", (email,))
+                cursor.execute("SELECT id, name, email, password, is_verified, planifyme_calendar_id FROM users WHERE email = %s", (email,))
                 user_data = cursor.fetchone()
                 if user_data:
                     return User(
@@ -23,7 +23,8 @@ class UserRepositoryImpl(UserRepository):
                         name=user_data[1],
                         email=user_data[2],
                         password=user_data[3],
-                        is_verified=user_data[4]
+                        is_verified=user_data[4],
+                        planifyme_calendar_id=user_data[5]
                     )
                 else:
                     raise HTTPException(status_code=404, detail="User not found")
@@ -35,7 +36,7 @@ class UserRepositoryImpl(UserRepository):
 
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT id, name, email, password, is_verified FROM users WHERE name = %s", (username,))
+                cursor.execute("SELECT id, name, email, password, is_verified, planifyme_calendar_id FROM users WHERE name = %s", (username,))
                 user_data = cursor.fetchone()
                 if user_data:
                     return User(
@@ -43,7 +44,8 @@ class UserRepositoryImpl(UserRepository):
                         name=user_data[1],
                         email=user_data[2],
                         password=user_data[3],
-                        is_verified=user_data[4]
+                        is_verified=user_data[4],
+                        planifyme_calendar_id=user_data[5]
                     )
                 else:
                     raise HTTPException(status_code=404, detail="User not found")
@@ -55,7 +57,7 @@ class UserRepositoryImpl(UserRepository):
 
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT id, name, email, password, is_verified FROM users")
+                cursor.execute("SELECT id, name, email, password, is_verified, planifyme_calendar_id FROM users")
                 users_data = cursor.fetchall()
                 return [
                     User(
@@ -63,7 +65,8 @@ class UserRepositoryImpl(UserRepository):
                         name=user[1],
                         email=user[2],
                         password=user[3],
-                        is_verified=user[4]
+                        is_verified=user[4],
+                        planifyme_calendar_id=user[5]
                     ) for user in users_data
                 ]
         finally:
@@ -74,7 +77,7 @@ class UserRepositoryImpl(UserRepository):
 
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT id, name, email, password, is_verified FROM users WHERE id = %s", (user_id,))
+                cursor.execute("SELECT id, name, email, password, is_verified, planifyme_calendar_id FROM users WHERE id = %s", (user_id,))
                 user_data = cursor.fetchone()
                 if user_data:
                     return User(
@@ -82,7 +85,8 @@ class UserRepositoryImpl(UserRepository):
                         name=user_data[1],
                         email=user_data[2],
                         password=user_data[3],
-                        is_verified=user_data[4]
+                        is_verified=user_data[4],
+                        planifyme_calendar_id=user_data[5]
                     )
                 else:
                     raise HTTPException(status_code=404, detail="User not found")
@@ -105,7 +109,8 @@ class UserRepositoryImpl(UserRepository):
                     name=user.name,
                     email=user.email,
                     password=user.password,
-                    is_verified=False
+                    is_verified=False,
+                    planifyme_calendar_id=0
                 )
         finally:
             DBConnectionFactory.release_connection(connection)
@@ -147,6 +152,19 @@ class UserRepositoryImpl(UserRepository):
                 cursor.execute(
                     "UPDATE users SET is_verified = %s WHERE id = %s",
                     (is_verified, user_id)
+                )
+                connection.commit()
+        finally:
+            DBConnectionFactory.release_connection(connection)
+
+    def update_planifyme_calendar_id(self, user_id: int, id_to_change: int) -> None:
+        connection = DBConnectionFactory.get_connection()
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE users SET planifyme_calendar_id = %s WHERE id = %s",
+                    (id_to_change, user_id)
                 )
                 connection.commit()
         finally:

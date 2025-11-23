@@ -18,6 +18,7 @@ from app.application.schemas.login_input_schema import loginInputSchema
 from app.domain.value_objects.create_user_schema import CreateUserSchema
 from app.infrastructure.apis.mail_sending_api_impl import MailSendingAPIImpl
 from app.application.schemas.verification_input_schema import VerificationInputSchema
+from app.domain.value_objects.create_calendar_schema import CreateCalendarSchema
 
 from app.application.schemas.event_times_schema import EventTimesSchema
 from app.application.schemas.calendar_events_times import CalendarEventsTimesSchema
@@ -107,8 +108,18 @@ def get_user_calendars_events_times(calendar_service: CalendarService = Depends(
 
 
 @router.post("/create_user", response_model=User, summary="Create a new user (first step)")
-def create_user(user: CreateUserSchema, service: UserService = Depends(get_user_service)):
-    return service.create_user(user)
+def create_user(user: CreateUserSchema, service: UserService = Depends(get_user_service), calendar_service: CalendarService = Depends(get_calendar_service)):
+    new_user = service.create_user(user)
+    
+    new_calendar = CreateCalendarSchema(
+        name="PlanyfyMe events",
+        description="Here are all the events that PlanifyMe Assistant create to you",
+        color="#B2EBF2",
+        user_id=new_user.id,
+    )
+    calendar_created = calendar_service.create_calendar(new_calendar)
+    service.update_planifyme_calendar_id(new_user.id, calendar_created.id)
+    return new_user
 
 @router.post("/validate_user", response_model=bool, summary="Validate user (second step)")
 def validate_user(validate_data: VerificationInputSchema, service: UserService = Depends(get_user_service)):
