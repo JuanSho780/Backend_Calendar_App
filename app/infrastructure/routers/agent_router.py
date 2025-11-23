@@ -46,7 +46,7 @@ def get_time_service():
 
 @router.get("/")
 def res_root():
-    return {"message": "Hola!! Soy PlanifyMe, tu assitente personal para planear y crear horarios de acuerdo a tus necesidades. Cuéntame, ¿en qué necesitas que te ayude?"}
+    return {"message": "Hola!! Soy PlanifyMe, tu asistente personal para planear y crear horarios de acuerdo a tus necesidades. Cuéntame, ¿en qué necesitas que te ayude?"}
 
 @router.post("/get_response", response_model=AgentOutputSchema, summary="get response from PlanifyMe AI Agent")
 def get_agent_response(user: AgentInputSchema, current_user: User = Depends(get_current_user), calendar_service: CalendarService = Depends(get_calendar_service), event_service: EventService = Depends(get_event_service), time_service: TimeService = Depends(get_time_service)):
