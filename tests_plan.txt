@@ -1,0 +1,269 @@
+# ====================================================================
+#   ESTE ARCHIVO ESTÁ COMPLETAMENTE COMENTADO
+#   SOLO PARA DOCUMENTACIÓN — NO AFECTA EL PROYECTO
+# ====================================================================
+
+
+# ====================================================================
+#  I. BLOQUE 1: TESTS DEL CHATBOT (COMPLETAMENTE COMENTADO)
+# ====================================================================
+
+# import pytest
+# from unittest.mock import patch 
+
+# class ServicioHorario:
+#     """Simula una clase que interactúa con un servicio externo para generar horarios."""
+#     def generar_horario(self, solicitud_usuario):
+#         raise NotImplementedError("Esto no debería ser llamado en un test mockeado.")
+
+# class Chatbot:
+#     """Clase principal del chatbot."""
+#     def _init_(self):
+#         self.servicio_horario = ServicioHorario()
+
+#     def procesar_mensaje(self, mensaje):
+#         if "generar horario" in mensaje.lower():
+#             horario = self.servicio_horario.generar_horario(mensaje)
+#             return f"Aquí está tu horario: {horario}"
+#         elif "hola" in mensaje.lower():
+#             return "¡Hola! Soy tu bot de horarios."
+#         else:
+#             return "Comando no reconocido."
+
+# @pytest.fixture
+# def chatbot_instance():
+#     return Chatbot()
+
+# @patch('_main_.ServicioHorario.generar_horario')
+# def test_generar_horario_exitoso_mock(mock_generar_horario, chatbot_instance):
+#     MOCK_RESPUESTA = "Horario MOCKEADO: 10:00-14:00"
+#     mock_generar_horario.return_value = MOCK_RESPUESTA
+#     mensaje_usuario = "generar horario de la universidad"
+#     respuesta_chatbot = chatbot_instance.procesar_mensaje(mensaje_usuario)
+#     assert MOCK_RESPUESTA in respuesta_chatbot
+#     assert "Aquí está tu horario:" in respuesta_chatbot
+#     mock_generar_horario.assert_called_once_with(mensaje_usuario)
+
+# @patch('_main_.ServicioHorario.generar_horario')
+# def test_generar_horario_simulando_error_de_servicio(mock_generar_horario, chatbot_instance):
+#     mock_generar_horario.side_effect = ConnectionError("No se pudo conectar al servidor de horarios.")
+#     with pytest.raises(ConnectionError) as excinfo:
+#         chatbot_instance.procesar_mensaje("generar horario de urgencia")
+#     assert "No se pudo conectar" in str(excinfo.value)
+#     mock_generar_horario.assert_called_once()
+
+
+
+# ====================================================================
+#  II. BLOQUE 2: TESTS DE CREACIÓN DE USUARIOS (COMPLETAMENTE COMENTADO)
+# ====================================================================
+
+# import pytest
+# from unittest.mock import MagicMock
+
+# class CreateUserSchema:
+#     """Simula el esquema de entrada para el registro."""
+#     def _init_(self, name, email, password):
+#         self.name = name
+#         self.email = email
+#         self.password = password
+
+# class ValidationException(Exception):
+#     pass
+
+# class MockUserService:
+#     def _init_(self, user_repo, mail_api, hash_func):
+#         self.user_repo = user_repo
+#         self.mail_api = mail_api
+#         self.hash_func = hash_func
+
+#     def _validate_schema(self, user_data: CreateUserSchema):
+#         if not user_data.name:
+#             raise ValidationException("Nombre: vacío")
+#         if len(user_data.name) > 20:
+#             raise ValidationException("Nombre: > 20 caracteres")
+#         if not user_data.email:
+#             raise ValidationException("Correo: vacío")
+#         if len(user_data.email) > 30:
+#             raise ValidationException("Correo: > 30 caracteres")
+#         if "@gmail.com" not in user_data.email:
+#             raise ValidationException("Correo: no cumple con @gmail")
+#         if not user_data.password:
+#             raise ValidationException("Contraseña: vacía")
+#         if len(user_data.password) > 255:
+#             raise ValidationException("Contraseña: > 255")
+
+#     def create_user(self, user_data: CreateUserSchema):
+#         self._validate_schema(user_data)
+#         processed_password = self.hash_func(user_data.password)
+#         schema_for_repo = CreateUserSchema(user_data.name, user_data.email, processed_password)
+#         created_user = self.user_repo.create_user(schema_for_repo)
+#         verification_code = self.mail_api.send_verification_email(user_data.email)
+#         self.user_repo.update_verification_code(created_user.id, verification_code)
+#         return created_user
+
+# @pytest.fixture
+# def mock_user_repo():
+#     return MagicMock(return_value=MagicMock())
+
+# @pytest.fixture
+# def mock_mail_api():
+#     return MagicMock()
+
+# @pytest.fixture
+# def mock_hashing_logic():
+#     hash_func = MagicMock(name="mock_get_password_hash")
+#     hash_func.side_effect = lambda p: p
+#     return hash_func
+
+# @pytest.fixture
+# def user_service(mock_user_repo, mock_mail_api, mock_hashing_logic):
+#     return MockUserService(mock_user_repo, mock_mail_api, mock_hashing_logic)
+
+# @pytest.mark.parametrize("name, email, password", [
+#     ("Usuario1", "usuario1@gmail.com", "pass123"),
+#     ("A" * 20, "maxname@gmail.com", "pass2"),
+#     ("LargoCorreo", "c" * 16 + "@gmail.com", "pass3"),
+# ])
+# def test_casos_uso_validos_success(user_service, mock_user_repo, name, email, password):
+#     user_data = CreateUserSchema(name=name, email=email, password=password)
+#     user_service.create_user(user_data)
+#     mock_user_repo.create_user.assert_called_once()
+#     user_service.mail_api.send_verification_email.assert_called_once()
+#     mock_user_repo.create_user.reset_mock()
+#     user_service.mail_api.send_verification_email.reset_mock()
+
+# @pytest.mark.parametrize("name, email, password, expected_error", [
+#     ("", "valid@gmail.com", "valid_pw", "Nombre: vacío"),
+#     ("A" * 21, "valid@gmail.com", "valid_pw", "Nombre: > 20 caracteres"),
+#     ("ValidName", "", "valid_pw", "Correo: vacío"),
+#     ("ValidName", "largo_mas_de_30_caracteres@gmail.com", "valid_pw", "Correo: > 30 caracteres"),
+#     ("ValidName", "invalid-email.com", "valid_pw", "Correo: no cumple con @gmail"),
+#     ("ValidName", "valid@gmail.com", "X" * 256, "Contraseña: > 255"),
+#     ("ValidName", "valid@gmail.com", "", "Contraseña: vacía"),
+# ])
+# def test_clases_no_validas_combinations(user_service, mock_user_repo, name, email, password, expected_error):
+#     user_data = CreateUserSchema(name=name, email=email, password=password)
+#     with pytest.raises(ValidationException, match=expected_error):
+#         user_service.create_user(user_data)
+#     mock_user_repo.create_user.assert_not_called()
+#     user_service.mail_api.send_verification_email.assert_not_called()
+
+
+
+# ====================================================================
+#  III. BLOQUE 3: TESTS DE ENTRADAS DE CALENDARIO (COMPLETAMENTE COMENTADO)
+# ====================================================================
+
+# import pytest
+# from unittest.mock import MagicMock
+# from datetime import datetime, time
+
+# class CreateScheduleEntrySchema:
+#     def _init_(self, calendar_id, title, description, location, schedule_blocks):
+#         self.calendar_id = calendar_id
+#         self.title = title
+#         self.description = description
+#         self.location = location
+#         self.schedule_blocks = schedule_blocks
+
+# class CustomException(Exception):
+#     pass
+
+# class MockScheduleEntryService:
+#     def _init_(self, schedule_repo):
+#         self.schedule_repo = schedule_repo
+
+#     def _validate_schema(self, entry_data):
+#         if entry_data.calendar_id is None:
+#             raise CustomException("VALIDATION_CALENDAR_EMPTY")
+#         if not (1 <= entry_data.calendar_id <= 60):
+#             raise CustomException("VALIDATION_CALENDAR_RANGE")
+#         if not entry_data.title:
+#             raise CustomException("VALIDATION_TITLE_EMPTY")
+#         if not (1 <= len(entry_data.title) <= 60):
+#             raise CustomException("VALIDATION_TITLE_RANGE")
+#         if not entry_data.description:
+#             raise CustomException("VALIDATION_DESCRIPTION_EMPTY")
+#         if not (1 <= len(entry_data.description) <= 200):
+#             raise CustomException("VALIDATION_DESCRIPTION_RANGE")
+#         if not entry_data.location:
+#             raise CustomException("VALIDATION_LOCATION_EMPTY")
+#         if not (1 <= len(entry_data.location) <= 40):
+#             raise CustomException("VALIDATION_LOCATION_RANGE")
+#         if not entry_data.schedule_blocks:
+#             raise CustomException("VALIDATION_BLOCKS_EMPTY")
+#         for block in entry_data.schedule_blocks:
+#             if 'start_time' in block and 'end_time' in block:
+#                 try:
+#                     start = time.fromisoformat(block['start_time'])
+#                     end = time.fromisoformat(block['end_time'])
+#                     if start >= end:
+#                         raise CustomException("VALIDATION_BLOCKS_TIME_INVALID")
+#                 except ValueError:
+#                     raise CustomException("VALIDATION_BLOCKS_FORMAT_INVALID")
+
+#     def create_schedule_entry(self, entry_data):
+#         self._validate_schema(entry_data)
+#         created_entry = self.schedule_repo.create_entry(entry_data)
+#         if isinstance(created_entry, Exception):
+#             raise created_entry
+#         return created_entry
+
+# @pytest.fixture
+# def mock_schedule_repo():
+#     return MagicMock(create_entry=MagicMock(return_value=MagicMock()))
+
+# @pytest.fixture
+# def schedule_service(mock_schedule_repo):
+#     return MockScheduleEntryService(mock_schedule_repo)
+
+# VALID_SCHEDULE_BLOCKS = [
+#     {"date": "2023-11-23", "start_time": "09:00:00", "end_time": "10:00:00"}
+# ]
+
+# @pytest.mark.parametrize("calendar_id, title, description, location", [
+#     (1, "Reunión Semanal", "Discutir el progreso del proyecto.", "Oficina Principal"),
+#     (60, "Presentación", "Presentación de resultados trimestrales.", "Sala de Conferencias"),
+#     (1, "A" * 60, "B" * 200, "C" * 40),
+# ])
+# def test_casos_uso_validos_success(schedule_service, mock_schedule_repo,
+#                                    calendar_id, title, description, location):
+#     entry_data = CreateScheduleEntrySchema(calendar_id, title, description, location, VALID_SCHEDULE_BLOCKS)
+#     mock_schedule_repo.create_entry.return_value = MagicMock()
+#     schedule_service.create_schedule_entry(entry_data)
+#     mock_schedule_repo.create_entry.assert_called_once_with(entry_data)
+#     mock_schedule_repo.create_entry.reset_mock()
+
+# @pytest.mark.parametrize("calendar_id, title, description, location, schedule_blocks, expected_error", [
+#     (61, "Titulo A", "Desc A", "Loc A", VALID_SCHEDULE_BLOCKS, "VALIDATION_CALENDAR_RANGE"),
+#     (1, "", "Desc B", "Loc B", VALID_SCHEDULE_BLOCKS, "VALIDATION_TITLE_EMPTY"),
+#     (1, "T" * 61, "Desc C", "Loc C", VALID_SCHEDULE_BLOCKS, "VALIDATION_TITLE_RANGE"),
+#     (1, "Titulo D", "", "Loc D", VALID_SCHEDULE_BLOCKS, "VALIDATION_DESCRIPTION_EMPTY"),
+#     (1, "Titulo E", "D" * 201, "Loc E", VALID_SCHEDULE_BLOCKS, "VALIDATION_DESCRIPTION_RANGE"),
+#     (1, "Titulo F", "Desc F", "", VALID_SCHEDULE_BLOCKS, "VALIDATION_LOCATION_EMPTY"),
+#     (1, "Titulo G", "Desc G", "L" * 41, VALID_SCHEDULE_BLOCKS, "VALIDATION_LOCATION_RANGE"),
+#     (1, "Titulo H", "Desc H", "Loc H", [], "VALIDATION_BLOCKS_EMPTY"),
+#     (1, "Titulo I", "Desc I", "Loc I",
+#      [{"date": "2023-11-23", "start_time": "10:00:00", "end_time": "09:00:00"}],
+#      "VALIDATION_BLOCKS_TIME_INVALID"),
+# ])
+# def test_clases_no_validas_combinations(schedule_service, mock_schedule_repo,
+#                                        calendar_id, title, description, location,
+#                                        schedule_blocks, expected_error):
+#     entry_data = CreateScheduleEntrySchema(calendar_id, title, description, location, schedule_blocks)
+#     with pytest.raises(CustomException, match=expected_error):
+#         schedule_service.create_schedule_entry(entry_data)
+#     mock_schedule_repo.create_entry.assert_not_called()
+
+# def test_fallo_de_negocio_repo_error(schedule_service, mock_schedule_repo):
+#     valid_data = CreateScheduleEntrySchema(1, "Valid", "Valid", "Valid", VALID_SCHEDULE_BLOCKS)
+#     mock_schedule_repo.create_entry.return_value = Exception("CALENDAR_NOT_FOUND_DB")
+#     with pytest.raises(Exception, match="CALENDAR_NOT_FOUND_DB"):
+#         schedule_service.create_schedule_entry(valid_data)
+#     mock_schedule_repo.create_entry.assert_called_once()
+
+
+# ====================================================================
+#   FIN DEL DOCUMENTO — TODO ESTÁ COMENTADO
+# ====================================================================
