@@ -26,6 +26,7 @@ from app.application.schemas.calendar_events_times import CalendarEventsTimesSch
 from app.domain.value_objects.return_user_schema import ReturnUserSchema
 from app.domain.value_objects.update_user_basic_info import UpdateUserBasicInfoSchema
 from app.domain.value_objects.update_password_user_schema import UpdateUserPasswordSchema
+from app.domain.value_objects.update_password_send_code import UpdateUserPasswordSchemaSendCode
 
 from app.domain.entities.User import User
 
@@ -167,16 +168,11 @@ def delete_user(service: UserService = Depends(get_user_service), current_user: 
         )
     return service.delete_user(current_user.id)
 
-@router.post("/change_password_send_ver_code/me", response_model=bool, summary="Change password send verification code")
-def change_password_send_ver_code(current_user: User = Depends(get_current_user), service: UserService = Depends(get_user_service)):
-    return service.change_password_send_verification_code(current_user.email)
+@router.post("/change_password_send_ver_code", response_model=bool, summary="Change password send verification code")
+def change_password_send_ver_code(user: UpdateUserPasswordSchemaSendCode, service: UserService = Depends(get_user_service)):
+    return service.change_password_send_verification_code(user.email)
 
 @router.put("/change_password/me", response_model=bool, summary="Change password for current user")
-def change_password(new_password: UpdateUserPasswordSchema, service: UserService = Depends(get_user_service), current_user: User = Depends(get_current_user)):
-    if not current_user.is_verified:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User is not verified",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+def change_password(new_password: UpdateUserPasswordSchema, service: UserService = Depends(get_user_service)):
+    current_user = service.get_user_by_email(new_password.email)
     return service.change_password(current_user.id, new_password.password, new_password.verification_code)

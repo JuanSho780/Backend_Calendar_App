@@ -31,18 +31,21 @@ Content-Type: application/json
 }
 
 ### 6. Change user password using JWT in header, send verification code
-POST http://127.0.0.1:8000/users/change_password_send_ver_code/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjQwMjk5NzR9.Lh_hM9uJSaZj7s8jmkf950zRCfnC_4Y8xtLCzyFHme4
-
-
-### 7. Change user password using JWT in header
-PUT http://127.0.0.1:8000/users/change_password/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqYXphdmFsYWdhZkBnbWFpbC5jb20iLCJleHAiOjE3NjQwMjk5NzR9.Lh_hM9uJSaZj7s8jmkf950zRCfnC_4Y8xtLCzyFHme4
+POST http://127.0.0.1:8000/users/change_password_send_ver_code
 Content-Type: application/json
 
 {
-    "password": "123456789",
-    "verification_code": "359671"
+    "email": "jazavalagaf@gmail.com"
+}
+
+### 7. Change user password using JWT in header
+PUT http://127.0.0.1:8000/users/change_password/me
+Content-Type: application/json
+
+{
+    "email": "jazavalagaf@gmail.com",
+    "password": "Juanzafi1$",
+    "verification_code": "859414"
 }
 
 ### 8. Get ALL info (calendars, events, times) by user using JWT in header
