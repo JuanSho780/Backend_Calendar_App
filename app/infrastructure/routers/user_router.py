@@ -167,6 +167,10 @@ def delete_user(service: UserService = Depends(get_user_service), current_user: 
         )
     return service.delete_user(current_user.id)
 
+@router.post("/change_password_send_ver_code/me", response_model=bool, summary="Change password send verification code")
+def change_password_send_ver_code(current_user: User = Depends(get_current_user), service: UserService = Depends(get_user_service)):
+    return service.change_password_send_verification_code(current_user.email)
+
 @router.put("/change_password/me", response_model=bool, summary="Change password for current user")
 def change_password(new_password: UpdateUserPasswordSchema, service: UserService = Depends(get_user_service), current_user: User = Depends(get_current_user)):
     if not current_user.is_verified:
@@ -175,4 +179,4 @@ def change_password(new_password: UpdateUserPasswordSchema, service: UserService
             detail="User is not verified",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return service.change_password(current_user.id, new_password.password)
+    return service.change_password(current_user.id, new_password.password, new_password.verification_code)

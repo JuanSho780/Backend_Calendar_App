@@ -76,6 +76,19 @@ class UserService:
     def delete_user(self, user_id: int) -> bool:
         return self.user_repository.delete_user(user_id)
     
-    def change_password(self, user_id: int, new_password: str) -> bool:
-        hashed_password = get_password_hash(new_password)
-        return self.user_repository.change_password(user_id, hashed_password)
+    def change_password_send_verification_code(self, email: str) -> bool:
+        user = self.user_repository.get_user_by_email(email)
+        verification_code = self.mail_sending_api.send_verification_email(user.email)
+
+        self.user_repository.update_verification_code(user.id, verification_code)
+        return True
+
+    def change_password(self, user_id: int, new_password: str, verification_code: str) -> bool:
+        db_verification_code = self.user_repository.get_verification_code(user_id)
+        if db_verification_code == verification_code:
+            self.user_repository.update_verification_code(user_id, None)
+            hashed_password = get_password_hash(new_password)
+            return self.user_repository.change_password(user_id, hashed_password)
+        
+        else:
+            return False
