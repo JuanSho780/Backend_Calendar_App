@@ -83,9 +83,10 @@ class UserService:
         self.user_repository.update_verification_code(user.id, verification_code)
         return True
 
-    def change_password(self, user_id: int, new_password: str) -> bool:
+    def change_password(self, user_id: int, new_password: str, verification_code: str) -> bool:
         db_verification_code = self.user_repository.get_verification_code(user_id)
-        if db_verification_code is None:
+        if db_verification_code == verification_code:
+            self.user_repository.update_verification_code(user_id, None)
             hashed_password = get_password_hash(new_password)
             return self.user_repository.change_password(user_id, hashed_password)
         

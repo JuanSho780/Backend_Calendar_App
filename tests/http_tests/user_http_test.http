@@ -39,13 +39,13 @@ Content-Type: application/json
 }
 
 ### 7. Change user password using JWT in header
-PUT http://127.0.0.1:8000/users/change_password/me
+PUT http://127.0.0.1:8000/users/change_password
 Content-Type: application/json
 
 {
     "email": "jazavalagaf@gmail.com",
-    "password": "Juanzafi1$",
-    "verification_code": "859414"
+    "password": "123456789",
+    "verification_code": "888823"
 }
 
 ### 8. Get ALL info (calendars, events, times) by user using JWT in header

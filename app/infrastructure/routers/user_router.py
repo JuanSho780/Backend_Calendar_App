@@ -175,4 +175,4 @@ def change_password_send_ver_code(user: UpdateUserPasswordSchemaSendCode, servic
 @router.put("/change_password", response_model=bool, summary="Change password for current user")
 def change_password(new_password: UpdateUserPasswordSchema, service: UserService = Depends(get_user_service)):
     current_user = service.get_user_by_email(new_password.email)
-    return service.change_password(current_user.id, new_password.password)
+    return service.change_password(current_user.id, new_password.password, new_password.verification_code)
